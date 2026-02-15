@@ -19,7 +19,7 @@ This is because the underlying model is trained on sentence-level similarity, so
 
 ## Performance
 
-Embedding generation runs locally in-browser using WASM, so it can take some time on large pages. Small articles process in a few seconds; very long pages (like detailed Wikipedia articles) may take longer. The model only needs to load once per session — subsequent pages will be faster.
+Embedding generation runs locally in-browser, so it can take some time on large pages. Small articles process in a few seconds; very long pages (like detailed Wikipedia articles) may take longer. The model only needs to load once per session — subsequent pages will be faster.
 
 ## Setup
 
