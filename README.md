@@ -1,44 +1,46 @@
-# Sift — Local document search (experimental)
+# Sift — Local document search 
 
-    Small Chrome extension + React UI that extracts page text, generates embeddings locally with a WebAssembly transformer, and searches by cosine similarity.
+Small Chrome extension + React UI that extracts page text, generates embeddings locally with a WebAssembly transformer, and searches by cosine similarity.
 
-    # Sift — Local document search (experimental)
+## Features
 
-    Small Chrome extension + React UI that extracts page text, generates embeddings locally with a WebAssembly transformer, and searches by cosine similarity.
+* **Semantic Search:** Uses vector embeddings to find content based on meaning rather than exact keyword matching.
+* **Client-Side AI:** Runs the `@huggingface/transformers` model entirely in the browser using WASM. No data is sent to external servers.
+* **DOM Interaction:** Automatically scrolls to and highlights relevant paragraphs or sections within the active tab.
 
-    ## Key files
+## Key files
 
-    - `src/content.ts` — page chunking and messaging to the background worker
-    - `src/background.ts` — service worker that generates and stores embeddings
-    - `src/App.tsx` — React UI
+* `src/content.ts` — Handles page chunking, DOM scraping, and highlights search results.
+* `src/background.ts` — Service worker that loads the pipeline, generates embeddings, and handles vector search.
+* `src/App.tsx` — React UI for the popup and search controls.
 
-    ## Getting started
+## Getting started
 
-    1. Install dependencies
+1. **Install dependencies**
+```bash
+npm install
 
-    ```bash
-    npm install
-    ```
+```
 
-    2. Start the dev server (UI only)
 
-    ```bash
-    npm run dev
-    ```
+2. **Start the dev server (UI only)**
+```bash
+npm run dev
 
-    3. Build the extension
+```
 
-    ```bash
-    npm run build
-    ```
 
-    4. Load in Chrome
+3. **Build the extension**
+```bash
+npm run build
 
-    Open `chrome://extensions`, enable Developer mode, click **Load unpacked**, and select the `build/` directory.
+```
 
-    ## Notes
 
-    - `background.ts` uses a WASM transformer; the model may download on first run, which can be slow.
-    - The project uses Vite; `.css` imports are handled at build time even if TypeScript shows a type warning.
+4. **Load in Chrome**
+Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `build/` directory.
 
-    If you want this README shorter or to include screenshots/badges, tell me what to add.
+## Notes
+
+* `background.ts` uses a WASM transformer; the model (Xenova/all-MiniLM-L6-v2) may download on first run, which can be slow.
+* The project uses Vite; `.css` imports are handled at build time even if TypeScript shows a type warning.
