@@ -1,0 +1,25 @@
+{
+  "name": "Sift",
+  "description": "Smart CTRL + F",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "activeTab", "tabs"],
+  "host_permissions": ["https://huggingface.co/*", "https://cdn-lfs.huggingface.co/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "content_scripts": [
+  {
+    "matches": ["<all_urls>"],
+    "js": ["content.js"], 
+    "run_at": "document_idle" 
+  }]
+}

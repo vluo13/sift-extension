@@ -1,0 +1,68 @@
+/* This makes the extension popup fit the content exactly */
+body {
+  margin: 0;
+  background-color: transparent;
+}
+
+/* The main horizontal bar */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  width: fit-content;
+}
+
+/* The actual text input */
+.search-input {
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  outline: none; /* Removes the thick blue focus ring */
+  width: 200px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #1a73e8; /* Chrome Blue */
+}
+
+/* The transparent arrow buttons */
+.arrow-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6368; /* Subtle grey */
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.arrow-btn:hover {
+  background-color: #f1f3f4; /* Subtle hover effect */
+  color: #202124;
+}
+
+.arrow-btn:active {
+  background-color: #e8eaed;
+}
+
+.match-count {
+  font-size: 12px;
+  color: #5f6368; /* Chrome's signature grey text */
+  margin-right: 8px;
+  user-select: none; /* Prevents the user from accidentally highlighting the "1 / 12" text */
+  font-family: sans-serif;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+}
