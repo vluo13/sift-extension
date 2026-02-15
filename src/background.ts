@@ -1,10 +1,6 @@
-import { pipeline, env } from '@huggingface/transformers';
+import { pipeline } from '@huggingface/transformers';
 import type { EmbeddedChunk } from './types';
 
-// Use single-threaded WASM backend (no Atomics, no createObjectURL)
-if (env.backends.onnx.wasm) {
-  env.backends.onnx.wasm.proxy = false;
-}
 let cachedPipe : any = null;
 
 async function getPipeline() {
@@ -25,24 +21,6 @@ async function generateEmbeddings(chunkedText: Map<string, string>) : Promise<Em
     return embeddingList;
 }
 
-// async function generateEmbeddings(chunkedText: Map<string, string>): Promise<EmbeddedChunk[]> {
-//     const pipe = await getPipeline();
-//     const entries = Array.from(chunkedText.entries()).filter(([, text]) => text.trim().length > 0);
-//     const texts = entries.map(([, text]) => text);
-    
-//     if (texts.length === 0) return [];
-    
-//     const out = await pipe(texts, { pooling: 'mean', normalize: true });
-//     const embeddingSize = out.dims.at(-1);
-//     const data: number[] = Array.from(out.data as Float32Array);
-    
-//     return entries.map(([id, text], i) => ({
-//         nodeId: id,
-//         text: text,
-//         embedding: data.slice(i * embeddingSize, (i + 1) * embeddingSize)
-//     }));
-// }
-
 function cosineSimilarity(a: number[], b: number[]): number {
   let dot = 0, normA = 0, normB = 0;
   for (let i = 0; i < a.length; i++) {
@@ -55,7 +33,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 async function searchEmbeddings(query : string, tabId : number) : Promise<EmbeddedChunk[]> {
     const result : any = await chrome.storage.session.get(tabId.toString());
-    const chunks: EmbeddedChunk[] = result[tabId];
+    const chunks: EmbeddedChunk[] = result[tabId.toString()];
     if (!chunks) return [];
 
     const pipe = await getPipeline();
@@ -80,7 +58,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     (async () => {
         const embeddings : EmbeddedChunk[] = await generateEmbeddings(new Map(Object.entries(message.data)));
-        chrome.storage.session.set({[tabId]: embeddings});
+        chrome.storage.session.set({[tabId.toString()]: embeddings});
         sendResponse({ status: "done" });
     })();
 

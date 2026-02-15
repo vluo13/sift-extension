@@ -1,46 +1,66 @@
-# Sift — Local document search 
+# Sift
 
-Small Chrome extension + React UI that extracts page text, generates embeddings locally with a WebAssembly transformer, and searches by cosine similarity.
+A Chrome extension that brings semantic search to any webpage. Instead of matching exact keywords like Ctrl+F, Sift understands the *meaning* of your query and finds the most relevant passages on the page.
 
-## Features
+## How It Works
 
-* **Semantic Search:** Uses vector embeddings to find content based on meaning rather than exact keyword matching.
-* **Client-Side AI:** Runs the `@huggingface/transformers` model entirely in the browser using WASM. No data is sent to external servers.
-* **DOM Interaction:** Automatically scrolls to and highlights relevant paragraphs or sections within the active tab.
+When you visit a page, Sift's content script breaks the page into text chunks and sends them to a background service worker. The service worker runs the [all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2) sentence transformer model locally via [Hugging Face Transformers.js](https://huggingface.co/docs/transformers.js) to generate embeddings for each chunk. When you search, your query is embedded and compared against the stored chunks using cosine similarity, returning the top 3 matches.
 
-## Key files
+Matched chunks are highlighted on the page and you can navigate between them using the arrow buttons in the popup.
 
-* `src/content.ts` — Handles page chunking, DOM scraping, and highlights search results.
-* `src/background.ts` — Service worker that loads the pipeline, generates embeddings, and handles vector search.
-* `src/App.tsx` — React UI for the popup and search controls.
+## Usage Tips
 
-## Getting started
+Sift works best when your queries are phrased as **natural language questions or longer statements** rather than short keywords. For example:
 
-1. **Install dependencies**
+- "What were the main causes of the conflict?" works better than "causes"
+- "How does photosynthesis produce energy?" works better than "photosynthesis energy"
+
+This is because the underlying model is trained on sentence-level similarity, so it understands full questions better than keyword fragments.
+
+## Performance
+
+Embedding generation runs locally in-browser using WASM, so it can take some time on large pages. Small articles process in a few seconds; very long pages (like detailed Wikipedia articles) may take longer. The model only needs to load once per session — subsequent pages will be faster.
+
+## Setup
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Install
+
 ```bash
+git clone <repo-url>
+cd sift
 npm install
-
 ```
 
+### Build
 
-2. **Start the dev server (UI only)**
-```bash
-npm run dev
-
-```
-
-
-3. **Build the extension**
 ```bash
 npm run build
-
 ```
 
+### Load in Chrome
 
-4. **Load in Chrome**
-Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `build/` directory.
+1. Go to `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select the `build` folder
 
-## Notes
+## Architecture
 
-* `background.ts` uses a WASM transformer; the model (Xenova/all-MiniLM-L6-v2) may download on first run, which can be slow.
-* The project uses Vite; `.css` imports are handled at build time even if TypeScript shows a type warning.
+| File | Role |
+|------|------|
+| `content.ts` | Chunks the page DOM into text blocks, tags elements with `data-chunk-id`, handles highlighting |
+| `background.ts` | Service worker that stores embeddings, runs cosine similarity search, relays messages |
+| `App.tsx` | Popup UI with search input and navigation controls |
+| `types.ts` | Shared `EmbeddedChunk` interface |
+
+## Tech Stack
+
+- React + TypeScript
+- Vite
+- Hugging Face Transformers.js (all-MiniLM-L6-v2)
+- Chrome Extensions Manifest V3

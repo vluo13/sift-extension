@@ -58,7 +58,6 @@ function chunk(root: Node): Map<string, string> {
 const chunkedText: Map<string, string> = chunk(document.body);
 
 // send to extension service worker
-
 async function sendChunks() {
     console.log("Sending chunks:", chunkedText.size);
     const message = {
@@ -66,13 +65,18 @@ async function sendChunks() {
         data: Object.fromEntries(chunkedText)
     };
 
-    try {
-        // Await the promise returned by sendMessage()
-        const response = await chrome.runtime.sendMessage(message);
-        console.log("Embedding generation completed:", response.status);
-    } catch (error) {
-        console.error("Embedding generation failed:", error);
+    // retry multiple times in case the extension service worker has died
+    for (let i = 0; i < 5; i++) {
+        try {
+            const response = await chrome.runtime.sendMessage(message);
+            console.log("Embedding generation completed:", response.status);
+            return;
+        } catch (error) {
+            console.log(`Attempt ${i + 1} failed, retrying...`);
+            await new Promise(r => setTimeout(r, 2000));
+        }
     }
+    console.error("Embedding generation failed after all retries");
 }
 
 sendChunks();
